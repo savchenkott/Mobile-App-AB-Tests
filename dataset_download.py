@@ -58,4 +58,4 @@ def df_basic_cleaning(df):
     return df_na_cleaned
 
 
-df_basic_cleaning(df=df)
+df_cleaned = df_basic_cleaning(df=df)
