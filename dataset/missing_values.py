@@ -1,8 +1,29 @@
 import pandas as pd
 
 
-def fill_na_values_numeric_column(dataframe, column_name):
-    df = dataframe.copy()
+def numeric_fill_methods(df, column_name, fill, fill_limit=None):
+    if fill == 'mean':
+        df[column_name] = df[column_name].fillna(df[column_name].mean(), limit=fill_limit)
+    elif fill == 'median':
+        df[column_name] = df[column_name].fillna(df[column_name].median(), limit=fill_limit)
+    else:
+        pass
+    return df
+
+
+def categorical_fill_methods(df, column_name, fill, fill_limit=None):
+    if fill == 'mode':
+        df[column_name] = df[column_name].fillna(df[column_name].mode()[0], limit=fill_limit)
+    elif fill == 'forward':
+        df[column_name] = df[column_name].fillna(method='ffill', limit=fill_limit)
+    elif fill == 'backward':
+        df[column_name] = df[column_name].fillna(method='bfill', limit=fill_limit)
+    else:
+        df[column_name] = df[column_name].fillna(fill, limit=fill_limit)
+    return df
+
+
+def fill_na_values_numeric_column(df, column_name):
     column = column_name
     fill = input(f"""For column '{column}' (type integer/float) choose the replacement type: 'mean', 'median', 'mode', 'forward', 'backward'.
     Format:                                                'mean'
@@ -10,42 +31,19 @@ def fill_na_values_numeric_column(dataframe, column_name):
     Set limit to replace only first n missing values:      'median; limit = 3'
     Enter 'skip' to leave the column values as they are:   'skip'
     """)
-    if ";" in fill:
-        fill_type = (fill.split(";", 1)[0])
-        fill_limit = int(fill.split(";", 1)[1].replace(" ", "").replace("limit=", ""))
-        if str(fill).strip() == 'mean':
-            df[column] = df[column].fillna(df[column].mean(), limit=fill_limit)
-        elif str(fill).strip() == 'median':
-            df[column] = df[column].fillna(df[column].median(), limit=fill_limit)
-        elif str(fill).strip() == 'mode':
-            df[column] = df[column].fillna(df[column].mode()[0], limit=fill_limit)
-        elif str(fill).strip() == 'forward':
-            df[column] = df[column].fillna(method='ffill', limit=fill_limit)
-        elif str(fill).strip() == 'backward':
-            df[column] = df[column].fillna(method='bfill', limit=fill_limit)
-        else:
-            df[column] = df[column].fillna(fill_type, limit=fill_limit)
-    elif fill == 'skip':
+    if fill == 'skip':
         pass
     else:
-        if str(fill).strip() == 'mean':
-            df[column] = df[column].fillna(df[column].mean())
-        elif str(fill).strip() == 'median':
-            df[column] = df[column].fillna(df[column].median())
-        elif str(fill).strip() == 'mode':
-            df[column] = df[column].fillna(df[column].mode()[0])
-        elif str(fill).strip() == 'forward':
-            df[column] = df[column].fillna(method='ffill')
-        elif str(fill).strip() == 'backward':
-            df[column] = df[column].fillna(method='bfill')
-        else:
-            df[column] = df[column].fillna(fill)
+        fill_type = (fill.split(";", 1)[0])
+        fill_limit = int(fill.split(";", 1)[1].replace(" ", "").replace("limit=", ""))
+        fill_content = str(fill_type).strip()
+        df[column] = numeric_fill_methods(df=df, column_name=column, fill=fill_content, fill_limit=fill_limit)
+        df[column] = categorical_fill_methods(df=df, column_name=column, fill=fill_content, fill_limit=fill_limit)
     print(" ")
     return df
 
 
-def fill_na_values_categorical_column(dataframe, column_name):
-    df = dataframe.copy()
+def fill_na_values_categorical_column(df, column_name):
     column = column_name
     fill = input(f"""For column '{column}' (type object, boolean, string or date) choose the replacement type: 'mode', 'forward', 'backward'.
     Format:                                                'mode'
@@ -53,36 +51,20 @@ def fill_na_values_categorical_column(dataframe, column_name):
     Set limit to replace only first n missing values:      'forward; limit = 3'
     Enter 'skip' to leave the column values as they are:   'skip'
     """)
-    if ";" in fill:
-        fill_type = fill.split(";", 1)[0]
-        fill_limit = int(fill.split(";", 1)[1].replace(" ", "").replace("limit=", ""))
-        if str(fill_type).strip() == 'mode':
-            df[column] = df[column].fillna(df[column].mode()[0], limit=fill_limit)
-        elif str(fill_type).strip() == 'forward':
-            df[column] = df[column].fillna(method='ffill', limit=fill_limit)
-        elif str(fill_type).strip() == 'backward':
-            df[column] = df[column].fillna(method='bfill', limit=fill_limit)
-        else:
-            df[column] = df[column].fillna(fill_type, limit=fill_limit)
-    elif fill == 'skip':
+    if fill == 'skip':
         pass
     else:
-        if str(fill).strip() == 'mode':
-            df[column] = df[column].fillna(df[column].mode()[0])
-        elif str(fill).strip() == 'forward':
-            df[column] = df[column].fillna(method='ffill')
-        elif str(fill).strip() == 'backward':
-            df[column] = df[column].fillna(method='bfill')
-        else:
-            df[column] = df[column].fillna(fill)
+        fill_type = (fill.split(";", 1)[0])
+        fill_limit = int(fill.split(";", 1)[1].replace(" ", "").replace("limit=", ""))
+        fill_content = str(fill_type).strip()
+        df[column] = categorical_fill_methods(df=df, column_name=column, fill=fill_content, fill_limit=fill_limit)
     print(" ")
     return df
 
 
-def fill_missing_values(dataframe):
-    df = dataframe.copy()
+def fill_missing_values(df):
 
-    print(f"""Choose columns to fill by writing their numbers: '0, 2, 5, 12' """)
+    print(f"""Choose columns to fill by writing their numbers: '1, 2, 5, 12' """)
     na_columns = df.columns[df.isna().any()].tolist()
     for i, column in enumerate(na_columns, start=1):
         print(f"{i}. {column}")
@@ -119,33 +101,26 @@ def remove_missing_values(df):
     return df_na_handled
 
 
-def handling_missing_values_in_df(df, remove_na):
-    if remove_na == 'y':
-        df_na_handled = remove_missing_values(df=df)
-        remove_na_2 = input("""Do you now want to fill some missing values? (Enter 'y' to fill, 'n' to leave
-""")
-        if remove_na_2 == 'y':
-            df_na_handled_2 = fill_missing_values(dataframe=df_na_handled)
-        elif remove_na_2 == 'n':
+def handling_missing_values_in_df(df, handle_option):
+    if handle_option == 'y':
+        print("Filling missing values...")
+        df_na_handled = fill_missing_values(df)
+
+        print("Do you now want to remove some of the left missing values? (Enter 'y' for yes, 'n' for no)")
+        remove_option = input()
+
+        if remove_option == 'y':
+            print("Removing remaining missing values...")
+            df_na_handled_2 = remove_missing_values(df_na_handled)
+        elif remove_option == 'n':
             df_na_handled_2 = df_na_handled
         else:
-            print(f"Unknown value. Leaving NA check.")
+            print(f"Unknown value. Skipping removing missing values.")
             df_na_handled_2 = df_na_handled
-    elif remove_na == 'f':
-        df_na_handled = fill_missing_values(dataframe=df)
-        remove_na_2 = input("""Do you now want to remove some missing values? (Enter 'y' to remove, 'n' to leave
-        """)
-        if remove_na_2 == 'y':
-            df_na_handled_2 = remove_missing_values(dataframe=df_na_handled)
-        elif remove_na_2 == 'n':
-            df_na_handled_2 = df_na_handled
-        else:
-            print(f"Unknown value. Leaving NA check.")
-            df_na_handled_2 = df_na_handled
-    elif remove_na == 'n':
-        df_na_handled = df
+    elif handle_option == 'n':
+        df_na_handled_2 = df
     else:
-        print(f"Unknown value. Leaving NA check.")
+        print(f"Unknown value. Skipping handling missing values")
         df_na_handled_2 = df
 
     return df_na_handled_2
@@ -161,20 +136,12 @@ def na_cleaning(df):
         print(f'No missing values')
         df_na_handled = df.copy()
 
-    elif percentage_of_na <= 5.0:
-        print("Missing values are taking less than 5% of the dataset.")
-        remove_na = input("""Remove them? (Enter 'y' to remove, 'f' to fill, 'n' to leave) 
-""")
-        df_na_handled = handling_missing_values_in_df(df, remove_na=remove_na)
-
-    elif percentage_of_na > 5.0:
-        print("Missing values are taking more than 5% of the dataset.")
-        remove_na = input("""Remove them? (Enter 'y' to remove, 'f' to fill, 'n' to leave) 
-""")
-        df_na_handled = handling_missing_values_in_df(df, remove_na=remove_na)
-
     else:
-        df_na_handled = df
+        print(f"Missing values are taking {round(percentage_of_na, 2)}% of the dataset.")
+        print("Choosing to handle missing values will first take you through the filling process and then the removal process.")
+        remove_na = input("""Handle them? (Enter 'y' to handle, 'n' to leave) 
+""")
+        df_na_handled = handling_missing_values_in_df(df, handle_option=remove_na)
 
     return df_na_handled
 
