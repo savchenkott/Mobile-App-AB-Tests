@@ -4,7 +4,9 @@ from dataset.duplicates import duplicates_step
 from dataset.set_data_types import setting_data_types_step
 from dataset.custom_corrections import custom_sanity_correction, custom_na_correction, custom_dtypes_correction,\
     duplicates_correction
-from ab_tests import z_score_for_df, unpaired_t_test_for_df, one_way_anova_for_df, two_way_anova_for_df, n_way_anova_for_df
+from ab_tests import z_test_for_df, unpaired_t_test_for_df, one_way_anova_for_df, two_way_anova_for_df, \
+    n_way_anova_for_df, two_sample_proportion_test_for_df, one_sample_proportion_test_for_df, \
+    chi_square_independence_test_for_df, chi_square_goodness_of_fit_test_for_df
 from scipy.stats import f_oneway
 from config.consts import *
 import pandas as pd
@@ -59,11 +61,12 @@ def df_basic_cleaning(df):
 
     return df_na_cleaned
 
-
+# df_cleaned = df
 df_cleaned = df_basic_cleaning(df=df)
 
-z_score = z_score_for_df(point=50, df=df_cleaned, column="sum_gamerounds")
-print(z_score)
+
+mean_test = z_test_for_df(point=50, df=df_cleaned, column="sum_gamerounds")
+print(mean_test)
 
 t_test = unpaired_t_test_for_df(df=df_cleaned, category_column='version', group1='gate_30', group2='gate_40',
                                 numerical_column='sum_gamerounds', tail='two')
@@ -90,3 +93,28 @@ dictionary_with_groups_ot = {'version': ['gate_30', 'gate_40'],
 
 n_way_anova_for_df_2 = n_way_anova_for_df(df=df_cleaned, dictionary_with_groups=dictionary_with_groups_ot, numerical_column='sum_gamerounds')
 print(n_way_anova_for_df_2)
+
+
+one_sample_proportion_test_for_df = one_sample_proportion_test_for_df(df=df_cleaned, categorical_column='retention_1',
+                                                                      value=True, h0_proportion=0.4, tail='two')
+print(one_sample_proportion_test_for_df)
+
+
+two_sample_proportion_test_for_df = two_sample_proportion_test_for_df(df=df_cleaned, categorical_column1='retention_1',
+                                                                      categorical_column2='retention_7', value1=False,
+                                                                      value2=False, tail='two')
+print(two_sample_proportion_test_for_df)
+
+
+chi_square_independence_test_for_df = chi_square_independence_test_for_df(df=df_cleaned, group_column='version', category_column='retention_1',
+                                           value_column='retention_7', value=True)
+print(chi_square_independence_test_for_df)
+
+
+expected_values = {True: 180, False: 750}
+chi_square_goodness_of_fit_test_for_df = chi_square_goodness_of_fit_test_for_df(df=df_cleaned,
+                                                                                category_column='retention_7',
+                                                                                expected_values=expected_values)
+print(chi_square_goodness_of_fit_test_for_df)
+
+

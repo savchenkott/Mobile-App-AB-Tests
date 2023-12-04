@@ -1,5 +1,5 @@
 import itertools
-from scipy.stats import norm, shapiro, t, f
+from scipy.stats import norm, shapiro, t, f, chi2
 import numpy as np
 import math
 import pandas as pd
@@ -7,7 +7,7 @@ from functools import reduce
 import operator
 
 
-def z_score(x, mean, stdev, right_tailed=True):
+def z_test(x, mean, stdev, right_tailed=True):
 
     z_score = (x-mean)/stdev
     if right_tailed == True:
@@ -19,17 +19,17 @@ def z_score(x, mean, stdev, right_tailed=True):
     return p_value
 
 
-def z_score_for_df(point, df, column, right_tailed=True):
+def z_test_for_df(point, df, column, right_tailed=True):
 
     mean = df[column].mean()
     stdev = df[column].std()
     normality = shapiro(df[column])[1]
 
     if normality <= 0.05:
-        p_value = z_score(x=point, mean=mean, stdev=stdev, right_tailed=right_tailed)
+        p_value = z_test(x=point, mean=mean, stdev=stdev, right_tailed=right_tailed)
     else:
         print(f"Data not normally distributed. Shapiro-Wilk test p-value is {normality}")
-        p_value = z_score(x=point, mean=mean, stdev=stdev, right_tailed=right_tailed)
+        p_value = z_test(x=point, mean=mean, stdev=stdev, right_tailed=right_tailed)
 
     return p_value
 
@@ -326,3 +326,138 @@ def n_way_anova_for_df(df, dictionary_with_groups, numerical_column):
     p_values = n_way_anova(ss_n=ss_n, ssw=ssw, ssi=ssi, n=n, k_n=k_n, groups=group_names)
 
     return p_values
+
+
+def one_sample_proportion_test(sample_proportion, h0_proportion, n, tail='two'):
+
+    z_numerator = (sample_proportion - h0_proportion)
+    z_denominator = math.sqrt((h0_proportion*(1-h0_proportion))/n)
+    
+    z_score = z_numerator / z_denominator
+    if tail == 'right':
+        p_value = 1 - norm.cdf(z_score)
+    elif tail == 'left':
+        p_value = norm.cdf(z_score)
+    elif tail == 'two':
+        if z_score > 0:
+            p_value = 2 * (1 - norm.cdf(z_score))
+        else:
+            p_value = 2 * norm.cdf(z_score)
+    else:
+        raise ValueError("tail must be 'right', 'left', or 'two'")
+
+    return p_value
+
+
+def one_sample_proportion_test_for_df(df, categorical_column, value, h0_proportion, tail='two'):
+
+    value_occurrence = len(df[df[categorical_column] == value])
+    n = len(df)
+    sample_proportion = value_occurrence / n
+
+    p_value = one_sample_proportion_test(sample_proportion=sample_proportion, h0_proportion=h0_proportion,
+                                         n=n, tail=tail)
+    return p_value
+
+
+def two_sample_proportion_test(sample_proportion1, sample_proportion2, n1, n2, tail='two'):
+
+    proportion = (sample_proportion1 + sample_proportion2) / (n1 + n2)
+    z_numerator = (sample_proportion1-sample_proportion2)
+    z_denominator = math.sqrt((proportion*(1-proportion))*(1/n1 + 1/n2))
+    z_score = z_numerator/z_denominator
+
+    if tail == 'right':
+        p_value = 1 - norm.cdf(z_score)
+    elif tail == 'left':
+        p_value = norm.cdf(z_score)
+    elif tail == 'two':
+        p_value = 2 * (1 - (norm.cdf(abs(z_score))))
+    else:
+        raise ValueError("tail must be 'right', 'left', or 'two'")
+
+    return p_value
+
+
+def two_sample_proportion_test_for_df(df, categorical_column1, categorical_column2, value1, value2, tail='two'):
+
+    value1_occurrence = len(df[df[categorical_column1] == value1])
+    n1 = len(df)
+
+    value2_occurrence = len(df[df[categorical_column2] == value2])
+    n2 = len(df)
+
+    sample_proportion1 = value1_occurrence / n1
+    sample_proportion2 = value2_occurrence / n2
+
+    p_value = two_sample_proportion_test(sample_proportion1=sample_proportion1, sample_proportion2=sample_proportion2,
+                                         n1=n1, n2=n2, tail=tail)
+
+    return p_value
+
+
+def chi_square_independence_test(frequencies, cell_values, n_categories, n_groups):
+
+    chi2_stat = 0
+    for freq, cell in zip(frequencies, cell_values):
+        chi2_stat += ((cell-freq)**2)/freq
+
+    degrees_of_freedom = (n_categories - 1) * (n_groups - 1)
+    p_value = 1 - chi2.cdf(chi2_stat, df=degrees_of_freedom)
+
+    return p_value
+
+
+def chi_square_independence_test_for_df(df, group_column, category_column, value_column, value):
+
+    row_totals = []
+    for group in df[group_column].unique():
+        row = len(df[(df[group_column] == group) & (df[value_column] == value)])
+        row_totals.append(row)
+
+    column_totals = []
+    for category in df[category_column].unique():
+        column = len(df[(df[category_column] == category) & (df[value_column] == value)])
+        column_totals.append(column)
+
+    grand_total = sum(row_totals)
+
+    frequencies = []
+    cell_values = []
+    for g, group in enumerate(df[group_column].unique(), start=0):
+        for c, category in enumerate(df[category_column].unique(), start=0):
+            value_n = len(df[(df[group_column] == group) & (df[category_column] == category) & (df[value_column] == value)])
+            cell_values.append(value_n)
+            freq_n = row_totals[g] * column_totals[c] / grand_total
+            frequencies.append(freq_n)
+
+    n_categories = len(df[group_column].unique())
+    n_groups = len(df[category_column].unique())
+
+    p_value = chi_square_independence_test(frequencies=frequencies, cell_values=cell_values, n_categories=n_categories, n_groups=n_groups)
+
+    return p_value
+
+
+def chi_square_goodness_of_fit_test(expected_values, observed_values):
+    chi2_stat = 0
+    for key in observed_values:
+        obs = observed_values[key]
+        exp = expected_values[key]
+        chi2_stat += ((obs-exp)**2)/exp
+
+    k = len(observed_values)
+    degrees_of_freedom = k - 1
+
+    p_value = 1 - chi2.cdf(chi2_stat, df=degrees_of_freedom)
+
+    return p_value
+
+
+def chi_square_goodness_of_fit_test_for_df(df, category_column, expected_values):
+
+    observed_values = {key: len(df[df[category_column] == key]) for key in expected_values}
+    p_value = chi_square_goodness_of_fit_test(expected_values=expected_values, observed_values=observed_values)
+
+    return p_value
+
