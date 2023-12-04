@@ -4,6 +4,8 @@ from dataset.duplicates import duplicates_step
 from dataset.set_data_types import setting_data_types_step
 from dataset.custom_corrections import custom_sanity_correction, custom_na_correction, custom_dtypes_correction,\
     duplicates_correction
+from ab_tests import z_score_for_df, unpaired_t_test_for_df, one_way_anova_for_df, two_way_anova_for_df, n_way_anova_for_df
+from scipy.stats import f_oneway
 from config.consts import *
 import pandas as pd
 import zipfile
@@ -59,3 +61,32 @@ def df_basic_cleaning(df):
 
 
 df_cleaned = df_basic_cleaning(df=df)
+
+z_score = z_score_for_df(point=50, df=df_cleaned, column="sum_gamerounds")
+print(z_score)
+
+t_test = unpaired_t_test_for_df(df=df_cleaned, category_column='version', group1='gate_30', group2='gate_40',
+                                numerical_column='sum_gamerounds', tail='two')
+print(t_test)
+
+one_way_anova = one_way_anova_for_df(df=df_cleaned, category_column='version', group_of_interest=['gate_30', 'gate_40'],
+                                     numerical_column='sum_gamerounds')
+one_way_anova_test = f_oneway(df_cleaned[df_cleaned['version'] == 'gate_30']['sum_gamerounds'], df_cleaned[df_cleaned['version'] == 'gate_40']['sum_gamerounds'])
+print(one_way_anova)
+
+dictionary_with_groups = {'version': ['gate_30', 'gate_40'],
+                          'retention_1': [True, False]}
+
+two_way_anova = two_way_anova_for_df(df=df_cleaned, dictionary_with_groups=dictionary_with_groups, numerical_column='sum_gamerounds')
+print(two_way_anova)
+
+n_way_anova_for_df_1 = n_way_anova_for_df(df=df_cleaned, dictionary_with_groups=dictionary_with_groups, numerical_column='sum_gamerounds')
+print(n_way_anova_for_df_1)
+
+dictionary_with_groups_ot = {'version': ['gate_30', 'gate_40'],
+                          'retention_1': [True, False],
+                          'retention_7': [True, False]}
+
+
+n_way_anova_for_df_2 = n_way_anova_for_df(df=df_cleaned, dictionary_with_groups=dictionary_with_groups_ot, numerical_column='sum_gamerounds')
+print(n_way_anova_for_df_2)

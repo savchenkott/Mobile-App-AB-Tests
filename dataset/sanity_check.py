@@ -15,7 +15,7 @@ def sanity_categorical_column(dataframe, subset):
 
     for column_n, column in enumerate(subset, start = 1):
 
-        if dataframe[column].dtype == 'object' or dataframe[column].dtype == 'boolean':
+        if dataframe[column].dtype == 'object' or dataframe[column].dtype == 'bool':
             number_of_unique_values = len(dataframe[column].unique())
 
             if number_of_unique_values <= 25:
@@ -123,7 +123,7 @@ def data_sanity_check(df):
         print(f"""Choose columns to check by writing their numbers: '1, 2, 5, 12'""")
         sanity_columns = df.columns.tolist()
         for i, column in enumerate(sanity_columns, start=1):
-            if df[column].dtype == 'object' or df[column].dtype == 'boolean':
+            if df[column].dtype == 'object' or df[column].dtype == 'bool':
                 number_of_unique_values = len(df[column].unique())
                 print(f"{i}. {column}. Type: {df[column].dtype}, unique values: {number_of_unique_values}")
             elif df[column].dtype == 'int64' or df[column].dtype == 'float':
