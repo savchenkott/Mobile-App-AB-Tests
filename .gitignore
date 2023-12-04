@@ -8,4 +8,5 @@
 .idea/modules.xml
 config/.DS_Store
 venv/
-__pycache__/
+dataset/__pycache__/
+config/__pycache__/

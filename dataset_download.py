@@ -13,6 +13,8 @@ import pandas as pd
 import zipfile
 import os
 
+import urllib.parse
+
 
 def get_df_from_kaggle(username, dataset, filename, delete_from_directory=True):
     """
@@ -27,10 +29,7 @@ def get_df_from_kaggle(username, dataset, filename, delete_from_directory=True):
     api = KaggleApi()
     api.authenticate()
     dataset_to_download = f'{username}/{dataset}'
-    api.dataset_download_file(dataset_to_download, file_name=filename, path='.')
-    with zipfile.ZipFile(f'{filename}.zip', 'r') as zip_ref:
-        zip_ref.extractall('.')
-    os.remove(f'{filename}.zip')
+    api.dataset_download_files(dataset_to_download, path='.', unzip=True)
     df = pd.read_csv(filename)
     if delete_from_directory:
         os.remove(f'{filename}')
@@ -40,7 +39,7 @@ def get_df_from_kaggle(username, dataset, filename, delete_from_directory=True):
 df = get_df_from_kaggle(username=DEFAULT_USERNAME, dataset=DEFAULT_DATASET, filename=DEFAULT_FILE)
 
 
-data = pd.read_excel('/Users/tanya/Desktop/Универ/KSE магистратура/Term II/S&E II/Group E. New York Airbnb.xlsx')
+# data = pd.read_excel('/Users/tanya/Desktop/Универ/KSE магистратура/Term II/S&E II/Group E. New York Airbnb.xlsx')
 
 
 def df_basic_cleaning(df):
@@ -64,57 +63,5 @@ def df_basic_cleaning(df):
 # df_cleaned = df
 df_cleaned = df_basic_cleaning(df=df)
 
-
-mean_test = z_test_for_df(point=50, df=df_cleaned, column="sum_gamerounds")
-print(mean_test)
-
-t_test = unpaired_t_test_for_df(df=df_cleaned, category_column='version', group1='gate_30', group2='gate_40',
-                                numerical_column='sum_gamerounds', tail='two')
-print(t_test)
-
-one_way_anova = one_way_anova_for_df(df=df_cleaned, category_column='version', group_of_interest=['gate_30', 'gate_40'],
-                                     numerical_column='sum_gamerounds')
-one_way_anova_test = f_oneway(df_cleaned[df_cleaned['version'] == 'gate_30']['sum_gamerounds'], df_cleaned[df_cleaned['version'] == 'gate_40']['sum_gamerounds'])
-print(one_way_anova)
-
-dictionary_with_groups = {'version': ['gate_30', 'gate_40'],
-                          'retention_1': [True, False]}
-
-two_way_anova = two_way_anova_for_df(df=df_cleaned, dictionary_with_groups=dictionary_with_groups, numerical_column='sum_gamerounds')
-print(two_way_anova)
-
-n_way_anova_for_df_1 = n_way_anova_for_df(df=df_cleaned, dictionary_with_groups=dictionary_with_groups, numerical_column='sum_gamerounds')
-print(n_way_anova_for_df_1)
-
-dictionary_with_groups_ot = {'version': ['gate_30', 'gate_40'],
-                          'retention_1': [True, False],
-                          'retention_7': [True, False]}
-
-
-n_way_anova_for_df_2 = n_way_anova_for_df(df=df_cleaned, dictionary_with_groups=dictionary_with_groups_ot, numerical_column='sum_gamerounds')
-print(n_way_anova_for_df_2)
-
-
-one_sample_proportion_test_for_df = one_sample_proportion_test_for_df(df=df_cleaned, categorical_column='retention_1',
-                                                                      value=True, h0_proportion=0.4, tail='two')
-print(one_sample_proportion_test_for_df)
-
-
-two_sample_proportion_test_for_df = two_sample_proportion_test_for_df(df=df_cleaned, categorical_column1='retention_1',
-                                                                      categorical_column2='retention_7', value1=False,
-                                                                      value2=False, tail='two')
-print(two_sample_proportion_test_for_df)
-
-
-chi_square_independence_test_for_df = chi_square_independence_test_for_df(df=df_cleaned, group_column='version', category_column='retention_1',
-                                           value_column='retention_7', value=True)
-print(chi_square_independence_test_for_df)
-
-
-expected_values = {True: 180, False: 750}
-chi_square_goodness_of_fit_test_for_df = chi_square_goodness_of_fit_test_for_df(df=df_cleaned,
-                                                                                category_column='retention_7',
-                                                                                expected_values=expected_values)
-print(chi_square_goodness_of_fit_test_for_df)
 
 

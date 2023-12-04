@@ -133,7 +133,7 @@ def na_cleaning(df):
     percentage_of_na = (na_values_sum/len(df)) * 100
 
     if percentage_of_na == 0.0:
-        print(f'No missing values')
+        print(f'No missing values found')
         df_na_handled = df.copy()
 
     else:

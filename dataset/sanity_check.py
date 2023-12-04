@@ -85,6 +85,7 @@ def sanity_numerical_column(dataframe, subset):
                 dataframe_outliers_cleaned = dataframe
 
             time.sleep(1.5)
+            print("")
         else:
             dataframe_outliers_cleaned = dataframe
 
@@ -107,6 +108,7 @@ def sanity_date_column(dataframe, subset):
             plt.tight_layout()
             plt.show()
             time.sleep(2)
+            print("")
 
 
         else:
