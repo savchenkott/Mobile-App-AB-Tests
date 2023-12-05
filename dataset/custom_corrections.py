@@ -1,3 +1,7 @@
+def preliminary_dataset(df):
+    return df
+
+
 def custom_dtypes_correction(df):
     return df
 

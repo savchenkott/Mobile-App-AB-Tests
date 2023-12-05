@@ -22,17 +22,29 @@ def get_df_from_kaggle(username, dataset, filename, delete_from_directory=True):
     :param username: str, Kaggle username of file owner
     :param dataset: str, Kaggle dataset name where the file is contained
     :param filename: str, the name of the file in the dataset to download
-    :param delete_from_directory: boolean, True - to delete the file from directory
+    :param delete_from_directory: boolean, True - to delete the df file from directory
     :return: df
     """
     from kaggle.api.kaggle_api_extended import KaggleApi
+
     api = KaggleApi()
     api.authenticate()
+
+    files_before = set(os.listdir('.'))
+
     dataset_to_download = f'{username}/{dataset}'
     api.dataset_download_files(dataset_to_download, path='.', unzip=True)
+    files_after = set(os.listdir('.'))
+    new_files = files_after - files_before
+
     df = pd.read_csv(filename)
+    for file in new_files:
+        if file != filename:
+            os.remove(file)
+
     if delete_from_directory:
-        os.remove(f'{filename}')
+        os.remove(filename)
+
     return df
 
 
@@ -59,6 +71,7 @@ def df_basic_cleaning(df):
     print("Data cleaning process done")
 
     return df_na_cleaned
+
 
 # df_cleaned = df
 df_cleaned = df_basic_cleaning(df=df)

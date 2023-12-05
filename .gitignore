@@ -10,3 +10,4 @@ config/.DS_Store
 venv/
 dataset/__pycache__/
 config/__pycache__/
+__pycache__/
