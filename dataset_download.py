@@ -67,6 +67,7 @@ def df_basic_cleaning(df):
 # df_generated = preliminary_dataset_corrections(df)
 df_cleaned = df_basic_cleaning(df=df)
 p_value = one_way_anova_for_df(df=df_cleaned, category_column='Subscription Type',
-                               group_of_interest=['Basic', 'Premium', 'Standard'], numerical_column='Monthly Revenue')
-print(rv.arpu_calculation(df=df_cleaned, revenue='Monthly Revenue', user_id='User ID'))
+                               group_of_interest=['Basic', 'Premium', 'Standard'], numerical_column='Period Revenue')
+print(rv.arpu_calculation(df=df_cleaned, revenue='Period Revenue', user_id='User ID'))
 print(rv.churn_rate_calculation(df=df_cleaned, user_id='User ID', payment='Payment Date'))
+print(rv.ltv_calculation(df=df_cleaned, revenue='Period Revenue', payment='Payment Date', user_id='User ID'))
