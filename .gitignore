@@ -1,13 +1,7 @@
 .env
 .DS_Store
-.idea
-.idea/Project 2.iml
-.idea/inspectionProfiles/Project_Default.xml
-.idea/inspectionProfiles/profiles_settings.xml
-.idea/misc.xml
-.idea/modules.xml
-config/.DS_Store
+.idea/
 venv/
-dataset/__pycache__/
+cleaning/__pycache__/
 config/__pycache__/
 __pycache__/

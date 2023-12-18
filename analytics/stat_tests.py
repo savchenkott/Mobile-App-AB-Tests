@@ -8,6 +8,15 @@ import operator
 
 
 def z_test(x, mean, stdev, right_tailed=True):
+    """
+    Calculates the p-value for a given z-score.
+
+    :param x: float, The observed value
+    :param mean: float, The mean of the population
+    :param stdev: float, The standard deviation of the population
+    :param right_tailed: bool, optional, If True, performs a right-tailed test. If False, performs a left-tailed test. Defaults to True.
+    :return: float, The calculated p-value
+    """
 
     z_score = (x-mean)/stdev
     if right_tailed == True:
@@ -20,6 +29,15 @@ def z_test(x, mean, stdev, right_tailed=True):
 
 
 def z_test_for_df(point, df, column, right_tailed=True):
+    """
+    Calculates the p-value for a given point from a dataframe column using the z-test.
+
+    :param point: float, The observed value
+    :param df: pandas.DataFrame, The dataframe containing the data
+    :param column: str, The column in the dataframe to perform the test on
+    :param right_tailed: bool, optional, If True, performs a right-tailed test. If False, performs a left-tailed test. Defaults to True.
+    :return: float, The calculated p-value
+    """
 
     mean = df[column].mean()
     stdev = df[column].std()
@@ -35,6 +53,18 @@ def z_test_for_df(point, df, column, right_tailed=True):
 
 
 def unpaired_t_test(x1, x2, std1, std2, n1, n2, tail='two'):
+    """
+    Calculates the p-value for an unpaired t-test.
+
+    :param x1: float, The mean of the first sample
+    :param x2: float, The mean of the second sample
+    :param std1: float, The standard deviation of the first sample
+    :param std2: float, The standard deviation of the second sample
+    :param n1: int, The size of the first sample
+    :param n2: int, The size of the second sample
+    :param tail: str, optional, The type of test to perform. Must be 'right', 'left', or 'two'. Defaults to 'two'.
+    :return: float, The calculated p-value
+    """
 
     se1 = (std1 ** 2)/ n1
     se2 = (std2 ** 2) / n2
@@ -54,6 +84,17 @@ def unpaired_t_test(x1, x2, std1, std2, n1, n2, tail='two'):
 
 
 def unpaired_t_test_for_df(df, category_column, group1, group2, numerical_column, tail='two'):
+    """
+    Calculates the p-value for an unpaired t-test for a given point from a dataframe column.
+
+    :param df: pandas.DataFrame, The dataframe containing the data
+    :param category_column: str, The column in the dataframe to group by
+    :param group1: str, The first group to compare
+    :param group2: str, The second group to compare
+    :param numerical_column: str, The column in the dataframe to perform the test on
+    :param tail: str, optional, The type of test to perform. Must be 'right', 'left', or 'two'. Defaults to 'two'.
+    :return: float, The calculated p-value
+    """
 
     df_for_group1 = df[df[category_column] == group1]
     df_for_group2 = df[df[category_column] == group2]
@@ -71,6 +112,15 @@ def unpaired_t_test_for_df(df, category_column, group1, group2, numerical_column
 
 
 def paired_t_test(differences_mean, differences_stdev, n, tail='two'):
+    """
+    Calculates the p-value for a paired t-test.
+
+    :param differences_mean: float, The mean of the differences
+    :param differences_stdev: float, The standard deviation of the differences
+    :param n: int, The number of differences
+    :param tail: str, optional, The type of test to perform. Must be 'right', 'left', or 'two'. Defaults to 'two'.
+    :return: float, The calculated p-value
+    """
 
     t_stat = (differences_mean * math.sqrt(n)) / differences_stdev
     degrees_of_freedom = n - 1
@@ -88,6 +138,19 @@ def paired_t_test(differences_mean, differences_stdev, n, tail='two'):
 
 
 def paired_t_test_for_df(df, id_column, period_column, period1, period2, numerical_column, tail='two'):
+    """
+    Calculates the p-value for a paired t-test for a given point from a dataframe column.
+
+    :param df: pandas.DataFrame, The dataframe containing the data
+    :param id_column: str, The column in the dataframe to identify unique entities
+    :param period_column: str, The column in the dataframe to identify the periods
+    :param period1: str, The first period to compare
+    :param period2: str, The second period to compare
+    :param numerical_column: str, The column in the dataframe to perform the test on
+    :param tail: str, optional, The type of test to perform. Must be 'right', 'left', or 'two'. Defaults to 'two'.
+    :return: float, The calculated p-value
+    """
+
     list_of_differences = []
 
     for unique_id in df[id_column].unique():
@@ -106,6 +169,16 @@ def paired_t_test_for_df(df, id_column, period_column, period1, period2, numeric
 
 
 def one_way_anova(sst, ssw, n, k):
+    """
+    Calculates the p-value for a one-way ANOVA test.
+
+    :param sst: float, The total sum of squares
+    :param ssw: float, The sum of squares within groups
+    :param n: int, The total number of observations
+    :param k: int, The number of groups
+    :return: float, The calculated p-value
+    """
+
     ssb = sst - ssw
     degrees_of_freedom_within = n - k
     degrees_of_freedom_between = k - 1
@@ -120,6 +193,16 @@ def one_way_anova(sst, ssw, n, k):
 
 
 def one_way_anova_for_df(df, category_column, group_of_interest, numerical_column):
+    """
+    Calculates the p-value for a one-way ANOVA test for a given point from a dataframe column.
+
+    :param df: pandas.DataFrame, The dataframe containing the data
+    :param category_column: str, The column in the dataframe to group by
+    :param group_of_interest: list, The groups to compare
+    :param numerical_column: str, The column in the dataframe to perform the test on
+    :return: float, The calculated p-value
+    """
+
     df_for_anova = df[df[category_column].isin(group_of_interest)]
     grand_mean = df_for_anova[numerical_column].mean()
 
@@ -143,6 +226,18 @@ def one_way_anova_for_df(df, category_column, group_of_interest, numerical_colum
 
 
 def two_way_anova(ssa, ssb, ssw, ssi, n, k_a, k_b):
+    """
+    Calculates the p-values for a two-way ANOVA test.
+
+    :param ssa: float, The sum of squares for the first factor
+    :param ssb: float, The sum of squares for the second factor
+    :param ssw: float, The sum of squares within groups
+    :param ssi: float, The sum of squares for the interaction
+    :param n: int, The total number of observations
+    :param k_a: int, The number of levels for the first factor
+    :param k_b: int, The number of levels for the second factor
+    :return: tuple, The calculated p-values for the first factor, the second factor, and the interaction
+    """
 
     degrees_of_freedom_within = n - (k_a * k_b) # n - k_a * k_b
     degrees_of_freedom_a = k_a - 1
@@ -166,6 +261,14 @@ def two_way_anova(ssa, ssb, ssw, ssi, n, k_a, k_b):
 
 
 def two_way_anova_for_df(df, dictionary_with_groups, numerical_column):
+    """
+    Calculates the p-values for a two-way ANOVA test for a given point from a dataframe column.
+
+    :param df: pandas.DataFrame, The dataframe containing the data
+    :param dictionary_with_groups: dict, The dictionary with the two factors and their levels
+    :param numerical_column: str, The column in the dataframe to perform the test on
+    :return: dict, The calculated p-values for the first factor, the second factor, and the interaction
+    """
 
     var1 = list(dictionary_with_groups.keys())[0]
     var2 = list(dictionary_with_groups.keys())[1]
@@ -224,6 +327,17 @@ def two_way_anova_for_df(df, dictionary_with_groups, numerical_column):
 
 
 def n_way_anova(ss_n, ssw, ssi, n, k_n, groups):
+    """
+    Calculates the p-values for an n-way ANOVA test.
+
+    :param ss_n: list, The sum of squares for each factor
+    :param ssw: float, The sum of squares within groups
+    :param ssi: float, The sum of squares for the interaction
+    :param n: int, The total number of observations
+    :param k_n: list, The number of levels for each factor
+    :param groups: list, The names of the groups
+    :return: list, The calculated p-values for each factor and the interaction
+    """
 
     degrees_of_freedom = []
     degrees_of_freedom_within = n - (reduce(operator.mul, k_n))
@@ -261,6 +375,14 @@ def n_way_anova(ss_n, ssw, ssi, n, k_n, groups):
 
 
 def n_way_anova_for_df(df, dictionary_with_groups, numerical_column):
+    """
+    Calculates the p-values for an n-way ANOVA test for a given point from a dataframe column.
+
+    :param df: pandas.DataFrame, The dataframe containing the data
+    :param dictionary_with_groups: dict, The dictionary with the factors and their levels
+    :param numerical_column: str, The column in the dataframe to perform the test on
+    :return: list, The calculated p-values for each factor and the interaction
+    """
 
     var_n = []
     for i, key in enumerate(list(dictionary_with_groups.keys()), start=0):
@@ -329,6 +451,15 @@ def n_way_anova_for_df(df, dictionary_with_groups, numerical_column):
 
 
 def one_sample_proportion_test(sample_proportion, h0_proportion, n, tail='two'):
+    """
+    Calculates the p-value for a one-sample proportion test.
+
+    :param sample_proportion: float, The proportion of the sample
+    :param h0_proportion: float, The null hypothesis proportion
+    :param n: int, The total number of observations
+    :param tail: str, optional, The type of test to perform. Must be 'right', 'left', or 'two'. Defaults to 'two'.
+    :return: float, The calculated p-value
+    """
 
     z_numerator = (sample_proportion - h0_proportion)
     z_denominator = math.sqrt((h0_proportion*(1-h0_proportion))/n)
@@ -350,6 +481,16 @@ def one_sample_proportion_test(sample_proportion, h0_proportion, n, tail='two'):
 
 
 def one_sample_proportion_test_for_df(df, categorical_column, value, h0_proportion, tail='two'):
+    """
+    Calculates the p-value for a one-sample proportion test for a given point from a dataframe column.
+
+    :param df: pandas.DataFrame, The dataframe containing the data
+    :param categorical_column: str, The column in the dataframe to perform the test on
+    :param value: str, The value in the categorical column to test
+    :param h0_proportion: float, The null hypothesis proportion
+    :param tail: str, optional, The type of test to perform. Must be 'right', 'left', or 'two'. Defaults to 'two'.
+    :return: float, The calculated p-value
+    """
 
     value_occurrence = len(df[df[categorical_column] == value])
     n = len(df)
@@ -361,6 +502,16 @@ def one_sample_proportion_test_for_df(df, categorical_column, value, h0_proporti
 
 
 def two_sample_proportion_test(sample_proportion1, sample_proportion2, n1, n2, tail='two'):
+    """
+    Calculates the p-value for a two-sample proportion test.
+
+    :param sample_proportion1: float, The proportion of the first sample
+    :param sample_proportion2: float, The proportion of the second sample
+    :param n1: int, The total number of observations in the first sample
+    :param n2: int, The total number of observations in the second sample
+    :param tail: str, optional, The type of test to perform. Must be 'right', 'left', or 'two'. Defaults to 'two'.
+    :return: float, The calculated p-value
+    """
 
     proportion = (sample_proportion1 + sample_proportion2) / (n1 + n2)
     z_numerator = (sample_proportion1-sample_proportion2)
@@ -380,6 +531,17 @@ def two_sample_proportion_test(sample_proportion1, sample_proportion2, n1, n2, t
 
 
 def two_sample_proportion_test_for_df(df, categorical_column1, categorical_column2, value1, value2, tail='two'):
+    """
+    Calculates the p-value for a two-sample proportion test for a given point from a dataframe column.
+
+    :param df: pandas.DataFrame, The dataframe containing the data
+    :param categorical_column1: str, The first column in the dataframe to perform the test on
+    :param categorical_column2: str, The second column in the dataframe to perform the test on
+    :param value1: str, The value in the first categorical column to test
+    :param value2: str, The value in the second categorical column to test
+    :param tail: str, optional, The type of test to perform. Must be 'right', 'left', or 'two'. Defaults to 'two'.
+    :return: float, The calculated p-value
+    """
 
     value1_occurrence = len(df[df[categorical_column1] == value1])
     n1 = len(df)
@@ -397,6 +559,15 @@ def two_sample_proportion_test_for_df(df, categorical_column1, categorical_colum
 
 
 def chi_square_independence_test(frequencies, cell_values, n_categories, n_groups):
+    """
+    Calculates the p-value for a Chi-square test of independence.
+
+    :param frequencies: list, The expected frequencies
+    :param cell_values: list, The observed frequencies
+    :param n_categories: int, The number of categories
+    :param n_groups: int, The number of groups
+    :return: float, The calculated p-value
+    """
 
     chi2_stat = 0
     for freq, cell in zip(frequencies, cell_values):
@@ -409,6 +580,16 @@ def chi_square_independence_test(frequencies, cell_values, n_categories, n_group
 
 
 def chi_square_independence_test_for_df(df, group_column, category_column, value_column, value):
+    """
+    Calculates the p-value for a Chi-square test of independence for a given point from a dataframe column.
+
+    :param df: pandas.DataFrame, The dataframe containing the data
+    :param group_column: str, The column in the dataframe to group by
+    :param category_column: str, The column in the dataframe to categorize by
+    :param value_column: str, The column in the dataframe to perform the test on
+    :param value: str, The value in the value column to test
+    :return: float, The calculated p-value
+    """
 
     row_totals = []
     for group in df[group_column].unique():
@@ -440,6 +621,14 @@ def chi_square_independence_test_for_df(df, group_column, category_column, value
 
 
 def chi_square_goodness_of_fit_test(expected_values, observed_values):
+    """
+    Calculates the p-value for a Chi-square goodness of fit test.
+
+    :param expected_values: dict, The expected frequencies
+    :param observed_values: dict, The observed frequencies
+    :return: float, The calculated p-value
+    """
+
     chi2_stat = 0
     for key in observed_values:
         obs = observed_values[key]
@@ -455,6 +644,14 @@ def chi_square_goodness_of_fit_test(expected_values, observed_values):
 
 
 def chi_square_goodness_of_fit_test_for_df(df, category_column, expected_values):
+    """
+    Calculates the p-value for a Chi-square goodness of fit test for a given point from a dataframe column.
+
+    :param df: pandas.DataFrame, The dataframe containing the data
+    :param category_column: str, The column in the dataframe to perform the test on
+    :param expected_values: dict, The expected frequencies
+    :return: float, The calculated p-value
+    """
 
     observed_values = {key: len(df[df[category_column] == key]) for key in expected_values}
     p_value = chi_square_goodness_of_fit_test(expected_values=expected_values, observed_values=observed_values)

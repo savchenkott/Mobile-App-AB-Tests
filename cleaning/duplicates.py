@@ -15,7 +15,7 @@ def duplicates_step(df):
         columns_indexes = [int(index) - 1 for index in columns_input.split(",")]
         columns_to_correct = [duplicates_columns[i] for i in columns_indexes]
 
-        duplicates = df[columns_to_correct].duplicated(keep=False)
+        duplicates = df[columns_to_correct].duplicated(keep='first')
         if duplicates.sum() > 0:
             print(f"Do you want to drop {duplicates.sum()} duplicates from the dataset? 'y' to drop, 'n' to leave")
             drop = input("")

@@ -1,30 +1,26 @@
-from dataset.missing_values import data_na_cleaning_step
-from dataset.sanity_check import data_sanity_step
-from dataset.duplicates import duplicates_step
-from dataset.set_data_types import setting_data_types_step
-from dataset.custom_corrections import custom_sanity_correction, custom_na_correction, custom_dtypes_correction,\
-    duplicates_correction
-from ab_tests import z_test_for_df, unpaired_t_test_for_df, one_way_anova_for_df, two_way_anova_for_df, \
-    n_way_anova_for_df, two_sample_proportion_test_for_df, one_sample_proportion_test_for_df, \
-    chi_square_independence_test_for_df, chi_square_goodness_of_fit_test_for_df
-from scipy.stats import f_oneway
+from cleaning.missing_values import data_na_cleaning_step
+from cleaning.sanity_check import data_sanity_step
+from cleaning.duplicates import duplicates_step
+from cleaning.set_data_types import setting_data_types_step
+from cleaning.custom_corrections import preliminary_dataset_corrections
+from analytics.stat_tests import one_way_anova_for_df
 from config.consts import *
 import pandas as pd
-import zipfile
 import os
-
-import urllib.parse
+import analytics.revenue as rv
 
 
 def get_df_from_kaggle(username, dataset, filename, delete_from_directory=True):
     """
-    Downloads specified dataset from Kaggle to directory and returns it as dataset.
+    Downloads specified cleaning from Kaggle to directory and returns it as cleaning.
+
     :param username: str, Kaggle username of file owner
-    :param dataset: str, Kaggle dataset name where the file is contained
-    :param filename: str, the name of the file in the dataset to download
+    :param dataset: str, Kaggle cleaning name where the file is contained
+    :param filename: str, the name of the file in the cleaning to download
     :param delete_from_directory: boolean, True - to delete the df file from directory
     :return: df
     """
+
     from kaggle.api.kaggle_api_extended import KaggleApi
 
     api = KaggleApi()
@@ -56,25 +52,21 @@ df = get_df_from_kaggle(username=DEFAULT_USERNAME, dataset=DEFAULT_DATASET, file
 
 def df_basic_cleaning(df):
 
-    df_dtypes_corrected = custom_dtypes_correction(df)
-    df_with_types = setting_data_types_step(df=df_dtypes_corrected)
-
-    df_sanity_corrected = custom_sanity_correction(df_with_types)
-    df_sanity_checked = data_sanity_step(df=df_sanity_corrected)
-
-    df_duplicates_corrected = duplicates_correction(df_sanity_checked)
-    df_duplicates_cleaned = duplicates_step(df=df_duplicates_corrected)
-
-    df_na_corrected = custom_na_correction(df_duplicates_cleaned)
-    df_na_cleaned = data_na_cleaning_step(df=df_na_corrected)
+    df_corrected = preliminary_dataset_corrections(df)
+    df_with_types = setting_data_types_step(df=df_corrected)
+    df_sanity_checked = data_sanity_step(df=df_with_types)
+    df_duplicates_cleaned = duplicates_step(df=df_sanity_checked)
+    df_na_cleaned = data_na_cleaning_step(df=df_duplicates_cleaned)
 
     print("Data cleaning process done")
 
     return df_na_cleaned
 
 
-# df_cleaned = df
+# df_generated = df
+# df_generated = preliminary_dataset_corrections(df)
 df_cleaned = df_basic_cleaning(df=df)
-
-
-
+p_value = one_way_anova_for_df(df=df_cleaned, category_column='Subscription Type',
+                               group_of_interest=['Basic', 'Premium', 'Standard'], numerical_column='Monthly Revenue')
+print(rv.arpu_calculation(df=df_cleaned, revenue='Monthly Revenue', user_id='User ID'))
+print(rv.churn_rate_calculation(df=df_cleaned, user_id='User ID', payment='Payment Date'))
