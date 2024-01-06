@@ -10,21 +10,34 @@ def preliminary_dataset_corrections(df, random_state=27):
     df = df.rename(columns={'Last Payment Date': 'Payment Date'})
 
     np.random.seed(random_state)
-    mask1 = np.random.rand(len(df)) < 0.1
-    df.loc[mask1, 'Plan Duration'] = '1 Months'
-    mask2 = (np.random.rand(len(df)) < 0.5) & ~mask1
-    df.loc[mask2, 'Plan Duration'] = '6 Months'
-    mask3 = ~(mask1 | mask2)
-    df.loc[mask3, 'Plan Duration'] = '12 Months'
+    device_order = ['SmartTV', 'Laptop', 'Tablet', 'Smartphone']
+    country_order = ['United States', 'United Kingdom', 'Canada', 'Australia', 'France', 'Mexico', 'Germany', 'Italy',
+                     'Spain', 'Mexico']
+    gender_order = ['Female', 'Male']
 
-    mask1 = np.random.rand(len(df)) < 0.9
-    df.loc[mask1, 'Subscription Type'] = 'Basic'
-    mask2 = (np.random.rand(len(df)) < 0.95) & ~mask1
-    df.loc[mask2, 'Subscription Type'] = 'Standard'
-    mask3 = ~(mask1 | mask2)
-    df.loc[mask3, 'Subscription Type'] = 'Premium'
+    for i, device in enumerate(device_order):
+        mask = (np.random.rand(len(df)) < 0.1 * (i + 1)) & (df['Device'] == device)
 
-    extension = df.sample(n=6000, replace=True, random_state=random_state).sort_values("User ID").reset_index(drop=True)
+        df.loc[mask, 'Plan Duration'] = '1 Month'
+        df.loc[~mask & (df['Device'] == device), 'Plan Duration'] = '12 Months'
+
+    for i, country in enumerate(country_order):
+        mask1 = (np.random.rand(len(df)) < 0.1 * (i + 1)) & (df['Country'] == country)
+        df.loc[mask1, 'Subscription Type'] = 'Basic'
+        mask2 = (np.random.rand(len(df)) < 0.3 * (i + 1)) & ~mask1 & (df['Country'] == country)
+        df.loc[mask2, 'Subscription Type'] = 'Standard'
+        mask3 = ~(mask1 | mask2) & (df['Country'] == country)
+        df.loc[mask3, 'Subscription Type'] = 'Premium'
+
+    for i, gender in enumerate(gender_order):
+        mask1 = (np.random.rand(len(df)) < 0.5 * (i + 1)) & (df['Gender'] == gender)
+        df.loc[mask1, 'Subscription Type'] = 'Basic'
+        mask2 = (np.random.rand(len(df)) < 0.7 * (i + 1)) & ~mask1 & (df['Gender'] == gender)
+        df.loc[mask2, 'Subscription Type'] = 'Standard'
+        mask3 = ~(mask1 | mask2) & (df['Gender'] == gender)
+        df.loc[mask3, 'Subscription Type'] = 'Premium'
+
+    extension = df.sample(n=10000, replace=True, random_state=random_state).sort_values("User ID").reset_index(drop=True)
     extension_cop = extension.copy()
     max_date = df['Payment Date'].max()
     indices_to_drop = []
@@ -45,7 +58,7 @@ def preliminary_dataset_corrections(df, random_state=27):
 
                 if u == 1:
                     mask4 = np.random.rand(len(extension_cop)) < 0.08
-                    extension_cop.loc[mask4, 'Plan Duration'] = np.random.choice(['1 Months', '6 Months', '12 Months'], size=mask4.sum())
+                    extension_cop.loc[mask4, 'Plan Duration'] = np.random.choice(['1 Month', '6 Months', '12 Months'], size=mask4.sum())
                 else:
                     pass
             else:

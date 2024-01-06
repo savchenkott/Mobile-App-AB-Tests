@@ -1,7 +1,5 @@
-from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 import pandas as pd
-from pandas import DateOffset
 
 
 def churn_rate_calculation(df, user_id, payment, date=None, timespan='whole'):

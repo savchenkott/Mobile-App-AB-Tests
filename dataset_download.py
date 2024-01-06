@@ -3,11 +3,11 @@ from cleaning.sanity_check import data_sanity_step
 from cleaning.duplicates import duplicates_step
 from cleaning.set_data_types import setting_data_types_step
 from cleaning.custom_corrections import preliminary_dataset_corrections
-from analytics.stat_tests import one_way_anova_for_df
 from config.consts import *
 import pandas as pd
 import os
 import analytics.revenue as rv
+import analytics.stat_tests as an
 
 
 def get_df_from_kaggle(username, dataset, filename, delete_from_directory=True):
@@ -44,12 +44,6 @@ def get_df_from_kaggle(username, dataset, filename, delete_from_directory=True):
     return df
 
 
-df = get_df_from_kaggle(username=DEFAULT_USERNAME, dataset=DEFAULT_DATASET, filename=DEFAULT_FILE)
-
-
-# data = pd.read_excel('/Users/tanya/Desktop/Универ/KSE магистратура/Term II/S&E II/Group E. New York Airbnb.xlsx')
-
-
 def df_basic_cleaning(df):
 
     df_corrected = preliminary_dataset_corrections(df)
@@ -63,11 +57,8 @@ def df_basic_cleaning(df):
     return df_na_cleaned
 
 
-# df_generated = df
-# df_generated = preliminary_dataset_corrections(df)
-df_cleaned = df_basic_cleaning(df=df)
-p_value = one_way_anova_for_df(df=df_cleaned, category_column='Subscription Type',
-                               group_of_interest=['Basic', 'Premium', 'Standard'], numerical_column='Period Revenue')
-print(rv.arpu_calculation(df=df_cleaned, revenue='Period Revenue', user_id='User ID'))
-print(rv.churn_rate_calculation(df=df_cleaned, user_id='User ID', payment='Payment Date'))
-print(rv.ltv_calculation(df=df_cleaned, revenue='Period Revenue', payment='Payment Date', user_id='User ID'))
+# p_value = an.one_way_anova_for_df(df=df_cleaned, category_column='Subscription Type',
+#                                group_of_interest=['Basic', 'Premium', 'Standard'], numerical_column='Period Revenue')
+# print(rv.arpu_calculation(df=df_cleaned, revenue='Period Revenue', user_id='User ID'))
+# print(rv.churn_rate_calculation(df=df_cleaned, user_id='User ID', payment='Payment Date'))
+# print(rv.ltv_calculation(df=df_cleaned, revenue='Period Revenue', payment='Payment Date', user_id='User ID'))

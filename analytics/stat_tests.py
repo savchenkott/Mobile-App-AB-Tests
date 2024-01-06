@@ -2,7 +2,6 @@ import itertools
 from scipy.stats import norm, shapiro, t, f, chi2
 import numpy as np
 import math
-import pandas as pd
 from functools import reduce
 import operator
 
