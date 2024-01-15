@@ -9,6 +9,7 @@ import operator
 def z_test(x, mean, stdev, right_tailed=True):
     """
     Calculates the p-value for a given z-score.
+    H0: the observed value x is not significantly different from the population mean.
 
     :param x: float, The observed value
     :param mean: float, The mean of the population
@@ -30,6 +31,7 @@ def z_test(x, mean, stdev, right_tailed=True):
 def z_test_for_df(point, df, column, right_tailed=True):
     """
     Calculates the p-value for a given point from a dataframe column using the z-test.
+    H0: the observed value x is not significantly different from the population mean.
 
     :param point: float, The observed value
     :param df: pandas.DataFrame, The dataframe containing the data
@@ -54,6 +56,7 @@ def z_test_for_df(point, df, column, right_tailed=True):
 def unpaired_t_test(x1, x2, std1, std2, n1, n2, tail='two'):
     """
     Calculates the p-value for an unpaired t-test.
+    H0: the mean of the first sample x1 is not significantly different from the mean of the second sample x2.
 
     :param x1: float, The mean of the first sample
     :param x2: float, The mean of the second sample
@@ -85,6 +88,7 @@ def unpaired_t_test(x1, x2, std1, std2, n1, n2, tail='two'):
 def unpaired_t_test_for_df(df, category_column, group1, group2, numerical_column, tail='two'):
     """
     Calculates the p-value for an unpaired t-test for a given point from a dataframe column.
+    H0: The mean of the first sample x1 is not significantly different from the mean of the second sample x2.
 
     :param df: pandas.DataFrame, The dataframe containing the data
     :param category_column: str, The column in the dataframe to group by
@@ -113,6 +117,7 @@ def unpaired_t_test_for_df(df, category_column, group1, group2, numerical_column
 def paired_t_test(differences_mean, differences_stdev, n, tail='two'):
     """
     Calculates the p-value for a paired t-test.
+    H0: the mean of the differences differences_mean is not significantly different from zero.
 
     :param differences_mean: float, The mean of the differences
     :param differences_stdev: float, The standard deviation of the differences
@@ -139,6 +144,7 @@ def paired_t_test(differences_mean, differences_stdev, n, tail='two'):
 def paired_t_test_for_df(df, id_column, period_column, period1, period2, numerical_column, tail='two'):
     """
     Calculates the p-value for a paired t-test for a given point from a dataframe column.
+    H0: the mean of the differences is not significantly different from zero.
 
     :param df: pandas.DataFrame, The dataframe containing the data
     :param id_column: str, The column in the dataframe to identify unique entities
@@ -170,6 +176,7 @@ def paired_t_test_for_df(df, id_column, period_column, period1, period2, numeric
 def one_way_anova(sst, ssw, n, k):
     """
     Calculates the p-value for a one-way ANOVA test.
+    H0: all group means are equal.
 
     :param sst: float, The total sum of squares
     :param ssw: float, The sum of squares within groups
@@ -194,6 +201,7 @@ def one_way_anova(sst, ssw, n, k):
 def one_way_anova_for_df(df, category_column, group_of_interest, numerical_column):
     """
     Calculates the p-value for a one-way ANOVA test for a given point from a dataframe column.
+    H0: all group means are equal.
 
     :param df: pandas.DataFrame, The dataframe containing the data
     :param category_column: str, The column in the dataframe to group by
@@ -227,6 +235,9 @@ def one_way_anova_for_df(df, category_column, group_of_interest, numerical_colum
 def two_way_anova(ssa, ssb, ssw, ssi, n, k_a, k_b):
     """
     Calculates the p-values for a two-way ANOVA test.
+    H0 for the first factor: All group means are equal at each level of the first factor.
+    H0 for the second factor: All group means are equal at each level of the second factor.
+    H0 for the interaction effect: There is no interaction effect between the two factors.
 
     :param ssa: float, The sum of squares for the first factor
     :param ssb: float, The sum of squares for the second factor
@@ -262,6 +273,9 @@ def two_way_anova(ssa, ssb, ssw, ssi, n, k_a, k_b):
 def two_way_anova_for_df(df, dictionary_with_groups, numerical_column):
     """
     Calculates the p-values for a two-way ANOVA test for a given point from a dataframe column.
+    H0 for the first factor: All group means are equal at each level of the first factor.
+    H0 for the second factor: All group means are equal at each level of the second factor.
+    H0 for the interaction effect: There is no interaction effect between the two factors.
 
     :param df: pandas.DataFrame, The dataframe containing the data
     :param dictionary_with_groups: dict, The dictionary with the two factors and their levels
@@ -328,6 +342,8 @@ def two_way_anova_for_df(df, dictionary_with_groups, numerical_column):
 def n_way_anova(ss_n, ssw, ssi, n, k_n, groups):
     """
     Calculates the p-values for an n-way ANOVA test.
+    H0 for each factor: All group means are equal at each level of each factor.
+    H0 for the interaction effect: There is no interaction effect among the factors.
 
     :param ss_n: list, The sum of squares for each factor
     :param ssw: float, The sum of squares within groups
@@ -376,6 +392,8 @@ def n_way_anova(ss_n, ssw, ssi, n, k_n, groups):
 def n_way_anova_for_df(df, dictionary_with_groups, numerical_column):
     """
     Calculates the p-values for an n-way ANOVA test for a given point from a dataframe column.
+    H0 for each factor: All group means are equal at each level of each factor.
+    H0 for the interaction effect: There is no interaction effect among the factors.
 
     :param df: pandas.DataFrame, The dataframe containing the data
     :param dictionary_with_groups: dict, The dictionary with the factors and their levels
@@ -452,6 +470,7 @@ def n_way_anova_for_df(df, dictionary_with_groups, numerical_column):
 def one_sample_proportion_test(sample_proportion, h0_proportion, n, tail='two'):
     """
     Calculates the p-value for a one-sample proportion test.
+    H0: the sample proportion is not significantly different from the hypothesized proportion h0_proportion.
 
     :param sample_proportion: float, The proportion of the sample
     :param h0_proportion: float, The null hypothesis proportion
@@ -482,6 +501,7 @@ def one_sample_proportion_test(sample_proportion, h0_proportion, n, tail='two'):
 def one_sample_proportion_test_for_df(df, categorical_column, value, h0_proportion, tail='two'):
     """
     Calculates the p-value for a one-sample proportion test for a given point from a dataframe column.
+    H0: the sample proportion is not significantly different from the hypothesized proportion h0_proportion
 
     :param df: pandas.DataFrame, The dataframe containing the data
     :param categorical_column: str, The column in the dataframe to perform the test on
@@ -503,6 +523,8 @@ def one_sample_proportion_test_for_df(df, categorical_column, value, h0_proporti
 def two_sample_proportion_test(sample_proportion1, sample_proportion2, n1, n2, tail='two'):
     """
     Calculates the p-value for a two-sample proportion test.
+    H0: the proportion of the first sample sample_proportion1 is not significantly different from the proportion of
+    the second sample sample_proportion2.
 
     :param sample_proportion1: float, The proportion of the first sample
     :param sample_proportion2: float, The proportion of the second sample
@@ -532,6 +554,7 @@ def two_sample_proportion_test(sample_proportion1, sample_proportion2, n1, n2, t
 def two_sample_proportion_test_for_df(df, categorical_column1, categorical_column2, value1, value2, tail='two'):
     """
     Calculates the p-value for a two-sample proportion test for a given point from a dataframe column.
+    H0: the proportion of the first sample is not significantly different from the proportion of the second sample.
 
     :param df: pandas.DataFrame, The dataframe containing the data
     :param categorical_column1: str, The first column in the dataframe to perform the test on
@@ -560,6 +583,7 @@ def two_sample_proportion_test_for_df(df, categorical_column1, categorical_colum
 def chi_square_independence_test(frequencies, cell_values, n_categories, n_groups):
     """
     Calculates the p-value for a Chi-square test of independence.
+    H0: the categorical variables represented by the frequencies and cell_values are independent.
 
     :param frequencies: list, The expected frequencies
     :param cell_values: list, The observed frequencies
@@ -581,6 +605,7 @@ def chi_square_independence_test(frequencies, cell_values, n_categories, n_group
 def chi_square_independence_test_for_df(df, group_column, category_column, value_column, value):
     """
     Calculates the p-value for a Chi-square test of independence for a given point from a dataframe column.
+    H0: the categorical variables represented by the group_column and category_column in the dataframe df are independent.
 
     :param df: pandas.DataFrame, The dataframe containing the data
     :param group_column: str, The column in the dataframe to group by
@@ -622,6 +647,8 @@ def chi_square_independence_test_for_df(df, group_column, category_column, value
 def chi_square_goodness_of_fit_test(expected_values, observed_values):
     """
     Calculates the p-value for a Chi-square goodness of fit test.
+    H0: the observed frequencies observed_values are not significantly different from the expected frequencies
+    expected_values.
 
     :param expected_values: dict, The expected frequencies
     :param observed_values: dict, The observed frequencies
@@ -645,6 +672,8 @@ def chi_square_goodness_of_fit_test(expected_values, observed_values):
 def chi_square_goodness_of_fit_test_for_df(df, category_column, expected_values):
     """
     Calculates the p-value for a Chi-square goodness of fit test for a given point from a dataframe column.
+    H0: the observed frequencies of each value in the category_column in the dataframe df are not significantly
+    different from the expected frequencies expected_values
 
     :param df: pandas.DataFrame, The dataframe containing the data
     :param category_column: str, The column in the dataframe to perform the test on

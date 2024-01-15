@@ -1,5 +1,6 @@
 import dataset_download as dd
 from config.consts import *
+import analytics.revenue as rv
 
 def main(path, overwrite=True, cleaning=True):
 
@@ -8,8 +9,6 @@ def main(path, overwrite=True, cleaning=True):
         df_cleaned = dd.df_basic_cleaning(df=df)
     else:
         df_cleaned = df
-
-    print(df_cleaned.head())
 
     if overwrite == True:
         df_cleaned.to_csv(path)
